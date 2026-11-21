@@ -1,0 +1,21 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+*.log
+TestResults/
+
+## Secretos y configuración local (NUNCA subir credenciales)
+.env
+appsettings.*.local.json
+appsettings.Production.json
+secrets.json
+
+## Salidas del ETL
+src/Etl.Worker/staging/
+src/Etl.Worker/logs/
+staging/
+logs/

@@ -1,0 +1,16 @@
+id,comentario,calificacion,fecha
+S001,"Excelente atención, resolvieron mi problema en minutos",5,2026-10-02
+S002,"El producto llegó tarde pero en buen estado",3,2026-10-03
+S003,"No volvería a comprar, la calidad es muy baja",1,2026-10-03
+S004,"Buen precio y buena garantía",4,2026-10-05
+S005,"La aplicación se cierra constantemente",2,2026-10-06
+S006,"Personal amable, local limpio y ordenado",5,2026-10-07
+S007,"Tardaron demasiado en la fila de caja",2,2026-10-08
+S008,"Cumple lo que promete, lo recomiendo",4,2026-10-09
+S009,,3,2026-10-10
+S010,"Calificación inválida de ejemplo",9,2026-10-11
+S011,"Muy buena variedad de productos",5,2026-10-12
+S012,"Servicio regular, podría mejorar",3,
+S013,"El soporte técnico no respondió mis correos",1,2026-10-14
+S014,"Entrega rápida y empaque cuidadoso",5,2026-10-15
+S015,"Fila de calificación mal formada",abc,2026-10-16

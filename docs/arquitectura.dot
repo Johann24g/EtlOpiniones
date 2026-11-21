@@ -1,0 +1,55 @@
+digraph G {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=20, labelloc=t, label="Arquitectura del proceso ETL de opiniones (Worker Service .NET 8)", pad=0.4, nodesep=0.35, ranksep=0.65, compound=true, bgcolor="white"];
+  node  [fontname="DejaVu Sans", fontsize=12, shape=box, style="rounded,filled", fillcolor="#FFFFFF", color="#4B5563", penwidth=1.4, margin="0.18,0.10"];
+  edge  [fontname="DejaVu Sans", fontsize=10, color="#374151", penwidth=1.3];
+
+  subgraph cluster_src {
+    label="FUENTES DE DATOS"; style="rounded,filled"; fillcolor="#EFF6FF"; color="#2563EB"; fontsize=13; fontname="DejaVu Sans Bold";
+    csv [label="CSV\nEncuestas internas", fillcolor="#DBEAFE"];
+    db  [label="BD relacional\nReseñas (SQL Server)\nusuario solo lectura", shape=cylinder, fillcolor="#DBEAFE"];
+    api [label="API REST\nComentarios (HTTPS)", fillcolor="#DBEAFE"];
+  }
+
+  subgraph cluster_cfg {
+    label="CONFIGURACIÓN Y SEGURIDAD"; style="rounded,filled"; fillcolor="#FEF3C7"; color="#D97706"; fontsize=13; fontname="DejaVu Sans Bold";
+    cfg [label="appsettings.json\n(rutas, query, URLs, intervalos)", fillcolor="#FDE68A"];
+    sec [label="User Secrets / Variables de entorno\n/ Key Vault\n(cadenas de conexión, API key)", fillcolor="#FDE68A"];
+  }
+
+  subgraph cluster_worker {
+    label="WORKER SERVICE ETL  (.NET 8 · Clean Architecture)"; style="rounded,filled"; fillcolor="#F0FDF4"; color="#16A34A"; fontsize=13; fontname="DejaVu Sans Bold";
+    worker [label="Worker\n(BackgroundService)\nciclo periódico", fillcolor="#BBF7D0"];
+    orch   [label="ExtractionOrchestrator\nTask.WhenAll · reintentos\naislamiento de fallos", fillcolor="#BBF7D0"];
+    csvx   [label="CsvExtractor\nCsvHelper", fillcolor="#DCFCE7"];
+    dbx    [label="DatabaseExtractor\nADO.NET", fillcolor="#DCFCE7"];
+    apix   [label="ApiExtractor\nIHttpClientFactory", fillcolor="#DCFCE7"];
+    val    [label="OpinionValidator\nnormaliza y descarta inválidos", fillcolor="#DCFCE7"];
+    wr     [label="IStagingWriter / DataLoader\nJsonFileStagingWriter\nSqlStagingWriter (SqlBulkCopy)", fillcolor="#BBF7D0"];
+    log    [label="ILogger + Serilog\nconsola · archivo diario", fillcolor="#E5E7EB"];
+  }
+
+  subgraph cluster_dw {
+    label="BD ANALÍTICA"; style="rounded,filled"; fillcolor="#FAF5FF"; color="#9333EA"; fontsize=13; fontname="DejaVu Sans Bold";
+    stg [label="staging.Opinion\n(tabla staging)", shape=cylinder, fillcolor="#E9D5FF"];
+    vw  [label="Vistas dw.*\n(usuario solo lectura)", shape=cylinder, fillcolor="#E9D5FF"];
+  }
+
+  dash [label="Dashboard\nPower BI", shape=box3d, fillcolor="#FBCFE8", color="#DB2777"];
+  tmp  [label="Archivos JSON\ntemporales (staging/)", shape=note, fillcolor="#FEF9C3"];
+
+  csv -> csvx [label="streaming"];
+  db  -> dbx  [label="DataReader"];
+  api -> apix [label="GET JSON"];
+
+  worker -> orch;
+  orch -> csvx; orch -> dbx; orch -> apix;
+  csvx -> val; dbx -> val; apix -> val;
+  val -> wr;
+  wr -> stg [label="modo Sql"];
+  wr -> tmp [label="modo Json", style=dashed];
+  stg -> vw -> dash;
+
+  cfg -> worker [style=dotted, color="#D97706"];
+  sec -> worker [style=dotted, color="#D97706"];
+  worker -> log [style=dotted, arrowhead=none, color="#6B7280"];
+}
